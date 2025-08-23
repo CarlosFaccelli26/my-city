@@ -1,10 +1,4 @@
-const activities = [
-    { id: 1, name: 'City Museum Tour', lat: 40.7128, lng: -74.0060 },
-    { id: 2, name: 'River Kayaking', lat: 40.7218, lng: -74.0100 },
-    { id: 3, name: 'Historical Walk', lat: 40.7090, lng: -74.0130 }
-];
-
-function initActivities() {
+function initActivities(activities) {
     const list = document.getElementById('activity-list');
     activities.forEach(act => {
         const item = document.createElement('li');
@@ -36,7 +30,7 @@ function closeBooking() {
 
 document.getElementById('close-modal').addEventListener('click', closeBooking);
 
-function initMap() {
+function initMap(activities) {
     const map = L.map('map').setView([40.7128, -74.0060], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
@@ -46,7 +40,17 @@ function initMap() {
     });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    initActivities();
-    initMap();
+async function loadActivities() {
+    const response = await fetch('activities.json');
+    return await response.json();
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const activities = await loadActivities();
+        initActivities(activities);
+        initMap(activities);
+    } catch (err) {
+        console.error('Failed to load activities:', err);
+    }
 });
